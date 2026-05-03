@@ -1,0 +1,32 @@
+# Ficheros de IA — no se suben a GitHub
+.claude/
+CLAUDE.md
+SDD.md
+GLOSSARY.md
+docs/
+
+# Dependencias y builds
+node_modules/
+dist/
+build/
+.venv/
+__pycache__/
+*.pyc
+target/
+*.class
+*.jar
+
+# Entorno
+.env
+.env.local
+*.pem
+*.key
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.swp
