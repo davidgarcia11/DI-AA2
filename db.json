@@ -1,0 +1,58 @@
+{
+  "users": [
+    {
+      "email": "free@test.com",
+      "password": "$2a$10$W38xHMCLQY6Bi1j9nivDP.MaBupaamKbQ7kgViNFd6Nuz9xNMqRja",
+      "role": "free",
+      "id": 1
+    },
+    {
+      "email": "premium@test.com",
+      "password": "$2a$10$mcL6k66d3G9PGUKI3hb6/e5eJb44kD/p7VZRhpGbVvyl2Lz0jwJee",
+      "role": "premium",
+      "id": 2
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": 1,
+      "userId": 1,
+      "name": "Netflix",
+      "price": 15.99,
+      "category": "entretenimiento",
+      "billingCycle": "monthly",
+      "renewalDate": "2026-06-15",
+      "domain": "netflix.com"
+    },
+    {
+      "id": 2,
+      "userId": 1,
+      "name": "Spotify",
+      "price": 9.99,
+      "category": "musica",
+      "billingCycle": "monthly",
+      "renewalDate": "2026-06-03",
+      "domain": "spotify.com"
+    },
+    {
+      "id": 3,
+      "userId": 2,
+      "name": "Adobe Creative Cloud",
+      "price": 54.99,
+      "category": "trabajo",
+      "billingCycle": "monthly",
+      "renewalDate": "2026-06-20",
+      "domain": "adobe.com"
+    },
+    {
+      "id": 4,
+      "userId": 2,
+      "name": "Spotify",
+      "price": 9.99,
+      "category": "musica",
+      "billingCycle": "monthly",
+      "renewalDate": "2026-06-10",
+      "domain": "spotify.com"
+    }
+  ]
+}
