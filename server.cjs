@@ -7,7 +7,7 @@ const router = jsonServer.router('db.json')
 app.db = router.db
 
 const rules = auth.rewriter({
-  subscriptions: 660,
+  subscriptions: 600,
 })
 
 app.use(rules)
