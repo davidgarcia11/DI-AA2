@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export default function LoginPage() {
@@ -24,31 +24,53 @@ export default function LoginPage() {
   }
 
   return (
-    <main>
-      <h1>Iniciar sesión</h1>
-      <form onSubmit={handleSubmit} noValidate>
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+    <main className="auth-page">
+      <section className="card auth-card" aria-labelledby="login-title">
+        <h1 id="login-title">Iniciar sesión</h1>
+        <p className="auth-subtitle">
+          Accede a tu panel de suscripciones.
+        </p>
 
-        <label htmlFor="password">Contraseña</label>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        <form className="auth-form" onSubmit={handleSubmit} noValidate>
+          <div className="field">
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-        {error && <p role="alert">{error}</p>}
+          <div className="field">
+            <label htmlFor="password">Contraseña</label>
+            <input
+              id="password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
 
-        <button type="submit">Entrar</button>
-      </form>
+          {error && (
+            <p className="alert alert--error" role="alert">
+              {error}
+            </p>
+          )}
+
+          <button type="submit" className="btn btn--primary">
+            Entrar
+          </button>
+        </form>
+
+        <p className="auth-switch">
+          ¿No tienes cuenta? <Link to="/register">Crear cuenta</Link>
+        </p>
+      </section>
     </main>
   )
 }

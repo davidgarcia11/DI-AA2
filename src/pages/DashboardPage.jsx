@@ -72,49 +72,75 @@ export default function DashboardPage() {
 
   return (
     <>
-      <h1>Mis suscripciones</h1>
+      <div className="dashboard-header">
+        <h1>Mis suscripciones</h1>
+        {status === 'ready' &&
+          (canAdd ? (
+            <Link to="/subscriptions/new" className="btn btn--primary">
+              + Nueva suscripción
+            </Link>
+          ) : (
+            <p className="alert alert--warning" role="status">
+              Has alcanzado el límite de {FREE_LIMIT} suscripciones del plan free.
+            </p>
+          ))}
+      </div>
+
+      {status === 'loading' && (
+        <p className="empty-state" role="status">
+          Cargando suscripciones…
+        </p>
+      )}
+      {status === 'error' && (
+        <p className="alert alert--error" role="alert">
+          Error al cargar las suscripciones. Inténtalo de nuevo más tarde.
+        </p>
+      )}
 
       {status === 'ready' && <StatsCard subscriptions={subscriptions} />}
 
       {status === 'ready' && isPremium && (
-        <section aria-label="Funcionalidades premium">
-          <h2>Gasto por categoría</h2>
-          <CategoryDonut subscriptions={subscriptions} />
-
-          <h2>Próximas renovaciones (7 días)</h2>
-          <UpcomingRenewalsWidget subscriptions={subscriptions} />
-
-          <ExportCsvButton subscriptions={subscriptions} />
+        <section className="premium-section" aria-label="Funcionalidades premium">
+          <div className="premium-grid">
+            <div>
+              <h2>Gasto por categoría</h2>
+              <CategoryDonut subscriptions={subscriptions} />
+            </div>
+            <div>
+              <h2>Próximas renovaciones (7 días)</h2>
+              <UpcomingRenewalsWidget subscriptions={subscriptions} />
+            </div>
+          </div>
+          <div className="premium-actions">
+            <ExportCsvButton subscriptions={subscriptions} />
+          </div>
         </section>
       )}
 
-      {status === 'ready' &&
-        (canAdd ? (
-          <Link to="/subscriptions/new">Nueva suscripción</Link>
-        ) : (
-          <p>Has alcanzado el límite de {FREE_LIMIT} suscripciones del plan free.</p>
-        ))}
-
-      {status === 'loading' && <p>Cargando suscripciones…</p>}
-      {status === 'error' && <p>Error al cargar las suscripciones.</p>}
-      {status === 'ready' && !hasSubs && <p>No tienes suscripciones todavía.</p>}
+      {status === 'ready' && !hasSubs && (
+        <p className="empty-state">
+          No tienes suscripciones todavía. Añade la primera con el botón de arriba.
+        </p>
+      )}
 
       {status === 'ready' && hasSubs && (
         <>
-          <div role="search">
-            <label>
-              Buscar
+          <div className="toolbar" role="search" aria-label="Filtros de la tabla">
+            <div className="field">
+              <label htmlFor="search-input">Buscar</label>
               <input
+                id="search-input"
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Nombre del servicio…"
               />
-            </label>
+            </div>
 
-            <label>
-              Categoría
+            <div className="field">
+              <label htmlFor="category-select">Categoría</label>
               <select
+                id="category-select"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               >
@@ -125,79 +151,107 @@ export default function DashboardPage() {
                   </option>
                 ))}
               </select>
-            </label>
+            </div>
           </div>
 
           {visibleSubs.length === 0 ? (
-            <p>No hay suscripciones que coincidan con los filtros.</p>
+            <p className="empty-state">
+              No hay suscripciones que coincidan con los filtros.
+            </p>
           ) : (
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">Logo</th>
-                  <th scope="col">
-                    <button
-                      type="button"
-                      onClick={() => handleSort('name')}
-                      aria-label="Ordenar por nombre"
+            <div className="table-wrapper">
+              <table className="subscriptions-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Logo</th>
+                    <th
+                      scope="col"
+                      aria-sort={ariaSort('name', sortBy, sortDir)}
                     >
-                      Nombre {renderSortIndicator('name', sortBy, sortDir)}
-                    </button>
-                  </th>
-                  <th scope="col">Categoría</th>
-                  <th scope="col">
-                    <button
-                      type="button"
-                      onClick={() => handleSort('price')}
-                      aria-label="Ordenar por precio"
-                    >
-                      Precio {renderSortIndicator('price', sortBy, sortDir)}
-                    </button>
-                  </th>
-                  <th scope="col">Ciclo</th>
-                  <th scope="col">
-                    <button
-                      type="button"
-                      onClick={() => handleSort('renewalDate')}
-                      aria-label="Ordenar por próxima renovación"
-                    >
-                      Próxima renovación{' '}
-                      {renderSortIndicator('renewalDate', sortBy, sortDir)}
-                    </button>
-                  </th>
-                  <th scope="col">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {visibleSubs.map((sub) => (
-                  <tr key={sub.id}>
-                    <td>
-                      <img
-                        src={getLogoUrl(sub.name, sub.domain)}
-                        alt={`Logo de ${sub.name}`}
-                        width="32"
-                        height="32"
-                      />
-                    </td>
-                    <td>{sub.name}</td>
-                    <td>{sub.category}</td>
-                    <td>{formatPrice(sub.price)}</td>
-                    <td>{sub.billingCycle === 'yearly' ? 'Anual' : 'Mensual'}</td>
-                    <td>
-                      <time dateTime={sub.renewalDate}>
-                        {formatDate(sub.renewalDate)}
-                      </time>
-                    </td>
-                    <td>
-                      <Link to={`/subscriptions/${sub.id}/edit`}>Editar</Link>
-                      <button type="button" onClick={() => handleDelete(sub.id)}>
-                        Eliminar
+                      <button
+                        type="button"
+                        onClick={() => handleSort('name')}
+                        aria-label="Ordenar por nombre"
+                      >
+                        Nombre {renderSortIndicator('name', sortBy, sortDir)}
                       </button>
-                    </td>
+                    </th>
+                    <th scope="col">Categoría</th>
+                    <th
+                      scope="col"
+                      aria-sort={ariaSort('price', sortBy, sortDir)}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => handleSort('price')}
+                        aria-label="Ordenar por precio"
+                      >
+                        Precio {renderSortIndicator('price', sortBy, sortDir)}
+                      </button>
+                    </th>
+                    <th scope="col">Ciclo</th>
+                    <th
+                      scope="col"
+                      aria-sort={ariaSort('renewalDate', sortBy, sortDir)}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => handleSort('renewalDate')}
+                        aria-label="Ordenar por próxima renovación"
+                      >
+                        Próxima renovación{' '}
+                        {renderSortIndicator('renewalDate', sortBy, sortDir)}
+                      </button>
+                    </th>
+                    <th scope="col">
+                      <span className="sr-only">Acciones</span>
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {visibleSubs.map((sub) => (
+                    <tr key={sub.id}>
+                      <td>
+                        <img
+                          src={getLogoUrl(sub.name, sub.domain)}
+                          alt={`Logo de ${sub.name}`}
+                          width="32"
+                          height="32"
+                        />
+                      </td>
+                      <td>{sub.name}</td>
+                      <td>{sub.category}</td>
+                      <td>{formatPrice(sub.price)}</td>
+                      <td>
+                        {sub.billingCycle === 'yearly' ? 'Anual' : 'Mensual'}
+                      </td>
+                      <td>
+                        <time dateTime={sub.renewalDate}>
+                          {formatDate(sub.renewalDate)}
+                        </time>
+                      </td>
+                      <td>
+                        <div className="row-actions">
+                          <Link
+                            to={`/subscriptions/${sub.id}/edit`}
+                            className="btn btn--ghost btn--small"
+                          >
+                            Editar
+                          </Link>
+                          <button
+                            type="button"
+                            className="btn btn--danger btn--small"
+                            onClick={() => handleDelete(sub.id)}
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </>
       )}
@@ -208,4 +262,9 @@ export default function DashboardPage() {
 function renderSortIndicator(column, sortBy, sortDir) {
   if (sortBy !== column) return ''
   return sortDir === 'asc' ? '▲' : '▼'
+}
+
+function ariaSort(column, sortBy, sortDir) {
+  if (sortBy !== column) return 'none'
+  return sortDir === 'asc' ? 'ascending' : 'descending'
 }

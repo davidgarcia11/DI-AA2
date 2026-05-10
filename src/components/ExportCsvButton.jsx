@@ -13,7 +13,7 @@ export default function ExportCsvButton({ subscriptions }) {
   }
 
   return (
-    <button type="button" onClick={handleClick}>
+    <button type="button" className="btn btn--primary" onClick={handleClick}>
       Exportar CSV
     </button>
   )

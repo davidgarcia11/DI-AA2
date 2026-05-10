@@ -70,86 +70,110 @@ export default function SubscriptionFormPage() {
   }
 
   return (
-    <>
+    <div className="form-page">
       <h1>{isEdit ? 'Editar suscripción' : 'Nueva suscripción'}</h1>
 
-      <form onSubmit={handleSubmit} noValidate>
-        <label>
-          Nombre
-          <input
-            name="name"
-            type="text"
-            value={form.name}
-            onChange={handleChange}
-            required
-          />
-        </label>
+      <form className="card" onSubmit={handleSubmit} noValidate>
+        <div className="form-grid">
+          <div className="field field--full">
+            <label htmlFor="name">Nombre</label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              value={form.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <label>
-          Precio (€)
-          <input
-            name="price"
-            type="number"
-            step="0.01"
-            min="0"
-            value={form.price}
-            onChange={handleChange}
-            required
-          />
-        </label>
+          <div className="field">
+            <label htmlFor="price">Precio (€)</label>
+            <input
+              id="price"
+              name="price"
+              type="number"
+              step="0.01"
+              min="0"
+              value={form.price}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <label>
-          Categoría
-          <select name="category" value={form.category} onChange={handleChange}>
-            {CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-        </label>
+          <div className="field">
+            <label htmlFor="category">Categoría</label>
+            <select
+              id="category"
+              name="category"
+              value={form.category}
+              onChange={handleChange}
+            >
+              {CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <label>
-          Ciclo de facturación
-          <select
-            name="billingCycle"
-            value={form.billingCycle}
-            onChange={handleChange}
+          <div className="field">
+            <label htmlFor="billingCycle">Ciclo de facturación</label>
+            <select
+              id="billingCycle"
+              name="billingCycle"
+              value={form.billingCycle}
+              onChange={handleChange}
+            >
+              <option value="monthly">Mensual</option>
+              <option value="yearly">Anual</option>
+            </select>
+          </div>
+
+          <div className="field">
+            <label htmlFor="renewalDate">Próxima renovación</label>
+            <input
+              id="renewalDate"
+              name="renewalDate"
+              type="date"
+              value={form.renewalDate}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="field field--full">
+            <label htmlFor="domain">Dominio (opcional)</label>
+            <input
+              id="domain"
+              name="domain"
+              type="text"
+              value={form.domain}
+              onChange={handleChange}
+              placeholder="netflix.com"
+            />
+          </div>
+        </div>
+
+        {error && (
+          <p className="alert alert--error" role="alert">
+            {error}
+          </p>
+        )}
+
+        <div className="form-actions">
+          <button
+            type="button"
+            className="btn"
+            onClick={() => navigate('/dashboard')}
           >
-            <option value="monthly">Mensual</option>
-            <option value="yearly">Anual</option>
-          </select>
-        </label>
-
-        <label>
-          Próxima renovación
-          <input
-            name="renewalDate"
-            type="date"
-            value={form.renewalDate}
-            onChange={handleChange}
-            required
-          />
-        </label>
-
-        <label>
-          Dominio (opcional)
-          <input
-            name="domain"
-            type="text"
-            value={form.domain}
-            onChange={handleChange}
-            placeholder="netflix.com"
-          />
-        </label>
-
-        {error && <p role="alert">{error}</p>}
-
-        <button type="submit">Guardar</button>
-        <button type="button" onClick={() => navigate('/dashboard')}>
-          Cancelar
-        </button>
+            Cancelar
+          </button>
+          <button type="submit" className="btn btn--primary">
+            Guardar
+          </button>
+        </div>
       </form>
-    </>
+    </div>
   )
 }
