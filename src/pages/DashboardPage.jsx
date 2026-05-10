@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import StatsCard from '../components/StatsCard'
 import { useAuth } from '../context/AuthContext'
 import {
   deleteSubscription,
@@ -39,6 +40,8 @@ export default function DashboardPage() {
   return (
     <>
       <h1>Mis suscripciones</h1>
+
+      {status === 'ready' && <StatsCard subscriptions={subscriptions} />}
 
       {status === 'ready' &&
         (canAdd ? (

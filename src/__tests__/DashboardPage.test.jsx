@@ -166,6 +166,18 @@ describe('DashboardPage', () => {
     expect(link).toHaveAttribute('href', '/subscriptions/new')
   })
 
+  test('renderiza el resumen de estadísticas junto a la lista', async () => {
+    subscriptionsService.getSubscriptions.mockResolvedValue(mockSubs)
+    loginAs('free')
+
+    renderAtDashboard()
+
+    expect(
+      await screen.findByRole('region', { name: /resumen de suscripciones/i }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /gasto mensual/i })).toBeInTheDocument()
+  })
+
   test('cada item tiene un enlace "Editar" que apunta a /subscriptions/:id/edit', async () => {
     subscriptionsService.getSubscriptions.mockResolvedValue(mockSubs)
     loginAs('free')
