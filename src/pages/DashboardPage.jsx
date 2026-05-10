@@ -7,7 +7,7 @@ import UpcomingRenewalsWidget from '../components/UpcomingRenewalsWidget'
 // Chart.js pesa ~150kB; sólo lo cargamos cuando un usuario premium llega al
 // dashboard. Para usuarios free el bundle principal queda mucho más ligero.
 const CategoryDonut = lazy(() => import('../components/CategoryDonut'))
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../context/useAuth'
 import {
   deleteSubscription,
   getSubscriptions,
@@ -29,7 +29,31 @@ export default function DashboardPage() {
   const [sortBy, setSortBy] = useState('')
   const [sortDir, setSortDir] = useState('asc')
 
-  const loadSubscriptions = useCallback(async () => {
+  // Carga inicial: efecto con flag de cancelación para evitar updates si el
+  // componente se desmonta antes de que llegue la respuesta. Las llamadas a
+  // setState se hacen dentro del callback async (post-await), no en el
+  // cuerpo síncrono del efecto.
+  useEffect(() => {
+    let cancelled = false
+    async function loadInitial() {
+      try {
+        const data = await getSubscriptions(token)
+        if (!cancelled) {
+          setSubscriptions(data)
+          setStatus('ready')
+        }
+      } catch {
+        if (!cancelled) setStatus('error')
+      }
+    }
+    loadInitial()
+    return () => {
+      cancelled = true
+    }
+  }, [token])
+
+  // Recarga manual tras un delete: vuelve al estado loading y refetch.
+  const reload = useCallback(async () => {
     setStatus('loading')
     try {
       const data = await getSubscriptions(token)
@@ -40,13 +64,9 @@ export default function DashboardPage() {
     }
   }, [token])
 
-  useEffect(() => {
-    loadSubscriptions()
-  }, [loadSubscriptions])
-
   async function handleDelete(id) {
     await deleteSubscription(token, id)
-    await loadSubscriptions()
+    await reload()
   }
 
   function handleSort(column) {

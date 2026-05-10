@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../context/useAuth'
 
 // Wrapper de las rutas autenticadas: navbar fija + Outlet donde se monta la
 // página activa. Se renderiza una sola vez y persiste entre navegaciones.

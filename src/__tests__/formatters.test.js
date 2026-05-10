@@ -1,4 +1,4 @@
-import { formatPrice, formatDate, daysUntil } from '../utils/formatters'
+import { formatPrice, daysUntil } from '../utils/formatters'
 
 test('formatPrice convierte número a precio en euros', () => {
   expect(formatPrice(15.9)).toBe('15,90 €')

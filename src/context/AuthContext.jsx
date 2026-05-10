@@ -1,8 +1,6 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import * as authService from '../services/auth.service'
-
-// Contexto: el "canal" por el que viajará el estado de auth a toda la app.
-const AuthContext = createContext(null)
+import { AuthContext } from './auth-context'
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
@@ -53,8 +51,4 @@ export function AuthProvider({ children }) {
   const value = { user, token, login, register, logout }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-}
-
-export function useAuth() {
-  return useContext(AuthContext)
 }
