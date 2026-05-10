@@ -85,3 +85,22 @@ test('al montar, recupera user y token de localStorage si existen', () => {
   expect(result.current.token).toBe('savedToken123')
   expect(result.current.user).toEqual(savedUser)
 })
+
+test('register actualiza user y token y los persiste en localStorage', async () => {
+  const newUser = { id: 2, email: 'nuevo@test.com', role: 'free' }
+  authService.register.mockResolvedValue({
+    accessToken: 'newToken456',
+    user: newUser,
+  })
+
+  const { result } = renderHook(() => useAuth(), { wrapper })
+
+  await act(async () => {
+    await result.current.register('nuevo@test.com', 'test1234')
+  })
+
+  expect(result.current.user).toEqual(newUser)
+  expect(result.current.token).toBe('newToken456')
+  expect(localStorage.getItem('token')).toBe('newToken456')
+  expect(JSON.parse(localStorage.getItem('user'))).toEqual(newUser)
+})
