@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../context/useAuth'
 
 // Guardia de ruta: si no hay usuario en el contexto, redirige a /login.
 // Si lo hay, deja pasar a los children.

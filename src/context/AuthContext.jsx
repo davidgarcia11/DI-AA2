@@ -1,8 +1,6 @@
-import { createContext, useContext, useState } from 'react'
+import { useEffect, useState } from 'react'
 import * as authService from '../services/auth.service'
-
-// Contexto: el "canal" por el que viajará el estado de auth a toda la app.
-const AuthContext = createContext(null)
+import { AuthContext } from './auth-context'
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
@@ -29,6 +27,17 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('user')
   }
 
+  // Si el interceptor HTTP detecta un 401 (token expirado o inválido), limpia
+  // el estado en memoria. ProtectedRoute redirigirá a /login automáticamente.
+  useEffect(() => {
+    function handleExpired() {
+      setUser(null)
+      setToken(null)
+    }
+    window.addEventListener('auth:expired', handleExpired)
+    return () => window.removeEventListener('auth:expired', handleExpired)
+  }, [])
+
   function persistSession({ accessToken, user }) {
     setUser(user)
     setToken(accessToken)
@@ -42,8 +51,4 @@ export function AuthProvider({ children }) {
   const value = { user, token, login, register, logout }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-}
-
-export function useAuth() {
-  return useContext(AuthContext)
 }

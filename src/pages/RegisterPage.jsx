@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/useAuth'
 
 export default function RegisterPage() {
   const { register } = useAuth()
@@ -24,32 +24,58 @@ export default function RegisterPage() {
   }
 
   return (
-    <main>
-      <h1>Crear cuenta</h1>
-      <form onSubmit={handleSubmit} noValidate>
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+    <main className="auth-page">
+      <section className="card auth-card" aria-labelledby="register-title">
+        <h1 id="register-title">Crear cuenta</h1>
+        <p className="auth-subtitle">
+          Registra tu email y empieza a controlar tus suscripciones.
+        </p>
 
-        <label htmlFor="password">Contraseña</label>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          minLength={8}
-        />
+        <form className="auth-form" onSubmit={handleSubmit} noValidate>
+          <div className="field">
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-        {error && <p role="alert">{error}</p>}
+          <div className="field">
+            <label htmlFor="password">Contraseña</label>
+            <input
+              id="password"
+              type="password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={8}
+              aria-describedby="password-help"
+            />
+            <span id="password-help" className="text-muted" style={{ fontSize: '0.85rem' }}>
+              Mínimo 8 caracteres.
+            </span>
+          </div>
 
-        <button type="submit">Crear cuenta</button>
-      </form>
+          {error && (
+            <p className="alert alert--error" role="alert">
+              {error}
+            </p>
+          )}
+
+          <button type="submit" className="btn btn--primary">
+            Crear cuenta
+          </button>
+        </form>
+
+        <p className="auth-switch">
+          ¿Ya tienes cuenta? <Link to="/login">Iniciar sesión</Link>
+        </p>
+      </section>
     </main>
   )
 }

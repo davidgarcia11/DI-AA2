@@ -5,14 +5,18 @@ export default function UpcomingRenewalsWidget({ subscriptions, daysAhead = 7 })
   const upcoming = upcomingRenewals(subscriptions, daysAhead)
 
   if (upcoming.length === 0) {
-    return <p>No hay renovaciones en los próximos {daysAhead} días.</p>
+    return (
+      <p className="text-muted">
+        No hay renovaciones en los próximos {daysAhead} días.
+      </p>
+    )
   }
 
   return (
-    <ul aria-label="Renovaciones próximas">
+    <ul className="renewals-list" aria-label="Renovaciones próximas">
       {upcoming.map((sub) => (
         <li key={sub.id}>
-          <strong>{sub.name}</strong>{' '}
+          <strong>{sub.name}</strong>
           <time dateTime={sub.renewalDate}>{formatDate(sub.renewalDate)}</time>
         </li>
       ))}
