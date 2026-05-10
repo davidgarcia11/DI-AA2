@@ -1,5 +1,9 @@
-import { expect, test } from 'vitest'
-import { computeStats } from '../utils/stats'
+import { expect, test, vi } from 'vitest'
+import {
+  computeByCategory,
+  computeStats,
+  upcomingRenewals,
+} from '../utils/stats'
 
 test('lista vacía devuelve count 0, total 0 y nextRenewal null', () => {
   expect(computeStats([])).toEqual({
@@ -34,4 +38,39 @@ test('nextRenewal devuelve la suscripción con la fecha más cercana', () => {
     { id: 3, name: 'Media', price: 8, billingCycle: 'monthly', renewalDate: '2026-08-15' },
   ]
   expect(computeStats(subs).nextRenewal.name).toBe('Cercana')
+})
+
+test('computeByCategory agrega el gasto mensual por categoría', () => {
+  const subs = [
+    { price: 10, billingCycle: 'monthly', category: 'entretenimiento' },
+    { price: 5, billingCycle: 'monthly', category: 'entretenimiento' },
+    { price: 120, billingCycle: 'yearly', category: 'trabajo' },
+    { price: 8, billingCycle: 'monthly', category: 'musica' },
+  ]
+  expect(computeByCategory(subs)).toEqual({
+    entretenimiento: 15,
+    trabajo: 10,
+    musica: 8,
+  })
+})
+
+test('computeByCategory con lista vacía devuelve un objeto vacío', () => {
+  expect(computeByCategory([])).toEqual({})
+})
+
+test('upcomingRenewals devuelve las suscripciones que renuevan en los próximos N días', () => {
+  vi.useFakeTimers()
+  vi.setSystemTime(new Date('2026-06-01T12:00:00'))
+
+  const subs = [
+    { id: 1, name: 'En 3 días', renewalDate: '2026-06-04' },
+    { id: 2, name: 'En 10 días', renewalDate: '2026-06-11' },
+    { id: 3, name: 'En 7 días', renewalDate: '2026-06-08' },
+    { id: 4, name: 'Ayer', renewalDate: '2026-05-31' },
+  ]
+
+  const result = upcomingRenewals(subs, 7)
+
+  expect(result.map((s) => s.name)).toEqual(['En 3 días', 'En 7 días'])
+  vi.useRealTimers()
 })
