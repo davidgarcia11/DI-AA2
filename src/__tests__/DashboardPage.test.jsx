@@ -8,6 +8,11 @@ import { formatDate, formatPrice } from '../utils/formatters'
 
 vi.mock('../services/subscriptions.service')
 
+// react-chartjs-2 requiere canvas; lo stubeamos para los tests del dashboard.
+vi.mock('react-chartjs-2', () => ({
+  Doughnut: () => <div data-testid="donut" />,
+}))
+
 function loginAs(role = 'free') {
   localStorage.setItem('token', 'fake-jwt')
   localStorage.setItem(
@@ -164,6 +169,35 @@ describe('DashboardPage', () => {
 
     const link = await screen.findByRole('link', { name: /nueva suscripción/i })
     expect(link).toHaveAttribute('href', '/subscriptions/new')
+  })
+
+  test('usuario premium ve la sección con donut, renovaciones próximas y export CSV', async () => {
+    subscriptionsService.getSubscriptions.mockResolvedValue(mockSubs)
+    loginAs('premium')
+
+    renderAtDashboard()
+
+    expect(
+      await screen.findByRole('region', { name: /funcionalidades premium/i }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /exportar csv/i }),
+    ).toBeInTheDocument()
+  })
+
+  test('usuario free NO ve la sección de funcionalidades premium', async () => {
+    subscriptionsService.getSubscriptions.mockResolvedValue(mockSubs)
+    loginAs('free')
+
+    renderAtDashboard()
+
+    await screen.findByText('Netflix')
+    expect(
+      screen.queryByRole('region', { name: /funcionalidades premium/i }),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /exportar csv/i }),
+    ).not.toBeInTheDocument()
   })
 
   test('renderiza el resumen de estadísticas junto a la lista', async () => {

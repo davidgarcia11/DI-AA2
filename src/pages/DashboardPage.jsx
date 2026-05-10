@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import CategoryDonut from '../components/CategoryDonut'
+import ExportCsvButton from '../components/ExportCsvButton'
 import StatsCard from '../components/StatsCard'
+import UpcomingRenewalsWidget from '../components/UpcomingRenewalsWidget'
 import { useAuth } from '../context/AuthContext'
 import {
   deleteSubscription,
@@ -36,12 +39,25 @@ export default function DashboardPage() {
   }
 
   const canAdd = canAddMore(subscriptions, user?.role)
+  const isPremium = user?.role === 'premium'
 
   return (
     <>
       <h1>Mis suscripciones</h1>
 
       {status === 'ready' && <StatsCard subscriptions={subscriptions} />}
+
+      {status === 'ready' && isPremium && (
+        <section aria-label="Funcionalidades premium">
+          <h2>Gasto por categoría</h2>
+          <CategoryDonut subscriptions={subscriptions} />
+
+          <h2>Próximas renovaciones (7 días)</h2>
+          <UpcomingRenewalsWidget subscriptions={subscriptions} />
+
+          <ExportCsvButton subscriptions={subscriptions} />
+        </section>
+      )}
 
       {status === 'ready' &&
         (canAdd ? (
