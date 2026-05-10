@@ -86,6 +86,22 @@ test('al montar, recupera user y token de localStorage si existen', () => {
   expect(result.current.user).toEqual(savedUser)
 })
 
+test('al recibir el evento auth:expired limpia user y token en memoria', async () => {
+  const savedUser = { id: 1, email: 'free@test.com', role: 'free' }
+  localStorage.setItem('token', 'savedToken123')
+  localStorage.setItem('user', JSON.stringify(savedUser))
+
+  const { result } = renderHook(() => useAuth(), { wrapper })
+  expect(result.current.user).toEqual(savedUser)
+
+  act(() => {
+    window.dispatchEvent(new Event('auth:expired'))
+  })
+
+  expect(result.current.user).toBeNull()
+  expect(result.current.token).toBeNull()
+})
+
 test('register actualiza user y token y los persiste en localStorage', async () => {
   const newUser = { id: 2, email: 'nuevo@test.com', role: 'free' }
   authService.register.mockResolvedValue({

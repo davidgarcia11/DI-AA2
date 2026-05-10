@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import * as authService from '../services/auth.service'
 
 // Contexto: el "canal" por el que viajará el estado de auth a toda la app.
@@ -28,6 +28,17 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
   }
+
+  // Si el interceptor HTTP detecta un 401 (token expirado o inválido), limpia
+  // el estado en memoria. ProtectedRoute redirigirá a /login automáticamente.
+  useEffect(() => {
+    function handleExpired() {
+      setUser(null)
+      setToken(null)
+    }
+    window.addEventListener('auth:expired', handleExpired)
+    return () => window.removeEventListener('auth:expired', handleExpired)
+  }, [])
 
   function persistSession({ accessToken, user }) {
     setUser(user)
