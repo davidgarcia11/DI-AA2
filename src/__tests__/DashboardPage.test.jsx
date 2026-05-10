@@ -122,6 +122,62 @@ describe('DashboardPage', () => {
     ).toBeInTheDocument()
   })
 
+  test('usuario free con menos de 5 subs ve el enlace "Nueva suscripción" activo', async () => {
+    subscriptionsService.getSubscriptions.mockResolvedValue(mockSubs)
+    loginAs('free')
+
+    renderAtDashboard()
+
+    const link = await screen.findByRole('link', { name: /nueva suscripción/i })
+    expect(link).toHaveAttribute('href', '/subscriptions/new')
+  })
+
+  test('usuario free al alcanzar el límite ve aviso y NO ve el enlace "Nueva suscripción"', async () => {
+    const fiveSubs = Array.from({ length: 5 }, (_, i) => ({
+      ...mockSubs[0],
+      id: i + 1,
+      name: `Servicio ${i + 1}`,
+    }))
+    subscriptionsService.getSubscriptions.mockResolvedValue(fiveSubs)
+    loginAs('free')
+
+    renderAtDashboard()
+
+    expect(
+      await screen.findByText(/has alcanzado el límite/i),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('link', { name: /nueva suscripción/i }),
+    ).not.toBeInTheDocument()
+  })
+
+  test('usuario premium siempre ve el enlace "Nueva suscripción", aunque tenga 10 subs', async () => {
+    const tenSubs = Array.from({ length: 10 }, (_, i) => ({
+      ...mockSubs[0],
+      id: i + 1,
+      name: `Servicio ${i + 1}`,
+    }))
+    subscriptionsService.getSubscriptions.mockResolvedValue(tenSubs)
+    loginAs('premium')
+
+    renderAtDashboard()
+
+    const link = await screen.findByRole('link', { name: /nueva suscripción/i })
+    expect(link).toHaveAttribute('href', '/subscriptions/new')
+  })
+
+  test('cada item tiene un enlace "Editar" que apunta a /subscriptions/:id/edit', async () => {
+    subscriptionsService.getSubscriptions.mockResolvedValue(mockSubs)
+    loginAs('free')
+
+    renderAtDashboard()
+
+    await screen.findByText('Netflix')
+    const editLinks = screen.getAllByRole('link', { name: /editar/i })
+    expect(editLinks[0]).toHaveAttribute('href', '/subscriptions/1/edit')
+    expect(editLinks[1]).toHaveAttribute('href', '/subscriptions/2/edit')
+  })
+
   test('botón eliminar borra la suscripción y refresca la lista', async () => {
     const user = userEvent.setup()
     subscriptionsService.getSubscriptions

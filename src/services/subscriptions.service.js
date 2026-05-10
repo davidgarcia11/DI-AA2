@@ -14,6 +14,11 @@ export async function getSubscriptions(token) {
   return response.data
 }
 
+export async function getSubscription(token, id) {
+  const response = await axios.get(`${API_URL}/subscriptions/${id}`, authHeader(token))
+  return response.data
+}
+
 export async function createSubscription(token, data) {
   const response = await axios.post(`${API_URL}/subscriptions`, data, authHeader(token))
   return response.data

@@ -1,6 +1,7 @@
 import { vi, test, expect, beforeEach } from 'vitest'
 import axios from 'axios'
 import {
+  getSubscription,
   getSubscriptions,
   createSubscription,
   updateSubscription,
@@ -27,6 +28,19 @@ test('getSubscriptions llama a GET /subscriptions con el header Authorization Be
     { headers: { Authorization: 'Bearer token123' } }
   )
   expect(result).toEqual(fakeSubscriptions)
+})
+
+test('getSubscription llama a GET /subscriptions/:id con el header Authorization', async () => {
+  const fake = { id: 5, name: 'Disney+', price: 8.99, userId: 1 }
+  axios.get.mockResolvedValue({ data: fake })
+
+  const result = await getSubscription('token123', 5)
+
+  expect(axios.get).toHaveBeenCalledWith(
+    expect.stringMatching(/\/subscriptions\/5$/),
+    { headers: { Authorization: 'Bearer token123' } },
+  )
+  expect(result).toEqual(fake)
 })
 
 test('createSubscription envía POST /subscriptions con body y header Authorization', async () => {

@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext'
 import DashboardPage from './pages/DashboardPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
+import SubscriptionFormPage from './pages/SubscriptionFormPage'
 
 // AuthProvider envuelve TODO el árbol de rutas para que ProtectedRoute
 // y cualquier página puedan leer el estado de auth con useAuth().
@@ -23,6 +24,11 @@ export default function App() {
           }
         >
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/subscriptions/new" element={<SubscriptionFormPage />} />
+          <Route
+            path="/subscriptions/:id/edit"
+            element={<SubscriptionFormPage />}
+          />
         </Route>
 
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
