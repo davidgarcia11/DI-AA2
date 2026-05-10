@@ -1,9 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import CategoryDonut from '../components/CategoryDonut'
 import ExportCsvButton from '../components/ExportCsvButton'
 import StatsCard from '../components/StatsCard'
 import UpcomingRenewalsWidget from '../components/UpcomingRenewalsWidget'
+
+// Chart.js pesa ~150kB; sólo lo cargamos cuando un usuario premium llega al
+// dashboard. Para usuarios free el bundle principal queda mucho más ligero.
+const CategoryDonut = lazy(() => import('../components/CategoryDonut'))
 import { useAuth } from '../context/AuthContext'
 import {
   deleteSubscription,
@@ -104,7 +107,9 @@ export default function DashboardPage() {
           <div className="premium-grid">
             <div>
               <h2>Gasto por categoría</h2>
-              <CategoryDonut subscriptions={subscriptions} />
+              <Suspense fallback={<p className="text-muted">Cargando gráfico…</p>}>
+                <CategoryDonut subscriptions={subscriptions} />
+              </Suspense>
             </div>
             <div>
               <h2>Próximas renovaciones (7 días)</h2>
