@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import {
   deleteSubscription,
   getSubscriptions,
 } from '../services/subscriptions.service'
+import { canAddMore, FREE_LIMIT } from '../utils/canAddMore'
 import { formatDate, formatPrice } from '../utils/formatters'
 import { getLogoUrl } from '../utils/logo'
 
 export default function DashboardPage() {
-  const { token } = useAuth()
+  const { token, user } = useAuth()
   const [subscriptions, setSubscriptions] = useState([])
   const [status, setStatus] = useState('loading')
 
@@ -32,9 +34,18 @@ export default function DashboardPage() {
     await loadSubscriptions()
   }
 
+  const canAdd = canAddMore(subscriptions, user?.role)
+
   return (
     <>
       <h1>Mis suscripciones</h1>
+
+      {status === 'ready' &&
+        (canAdd ? (
+          <Link to="/subscriptions/new">Nueva suscripción</Link>
+        ) : (
+          <p>Has alcanzado el límite de {FREE_LIMIT} suscripciones del plan free.</p>
+        ))}
 
       {status === 'loading' && <p>Cargando suscripciones…</p>}
       {status === 'error' && <p>Error al cargar las suscripciones.</p>}
@@ -60,6 +71,7 @@ export default function DashboardPage() {
                   </time>
                 </p>
               </div>
+              <Link to={`/subscriptions/${sub.id}/edit`}>Editar</Link>
               <button type="button" onClick={() => handleDelete(sub.id)}>
                 Eliminar
               </button>
