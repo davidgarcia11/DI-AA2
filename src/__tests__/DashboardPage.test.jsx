@@ -224,6 +224,82 @@ describe('DashboardPage', () => {
     expect(editLinks[1]).toHaveAttribute('href', '/subscriptions/2/edit')
   })
 
+  test('renderiza las suscripciones como una tabla con cabeceras', async () => {
+    subscriptionsService.getSubscriptions.mockResolvedValue(mockSubs)
+    loginAs('free')
+
+    renderAtDashboard()
+
+    expect(await screen.findByRole('table')).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: /nombre/i })).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: /precio/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole('columnheader', { name: /próxima renovación/i }),
+    ).toBeInTheDocument()
+  })
+
+  test('el input de búsqueda filtra las filas por nombre', async () => {
+    const user = userEvent.setup()
+    subscriptionsService.getSubscriptions.mockResolvedValue(mockSubs)
+    loginAs('free')
+
+    renderAtDashboard()
+    await screen.findByText('Netflix')
+
+    await user.type(screen.getByLabelText(/buscar/i), 'spo')
+
+    expect(screen.queryByText('Netflix')).not.toBeInTheDocument()
+    expect(screen.getByText('Spotify')).toBeInTheDocument()
+  })
+
+  test('el select de categoría filtra las filas', async () => {
+    const user = userEvent.setup()
+    subscriptionsService.getSubscriptions.mockResolvedValue(mockSubs)
+    loginAs('free')
+
+    renderAtDashboard()
+    await screen.findByText('Netflix')
+
+    await user.selectOptions(screen.getByLabelText(/categoría/i), 'musica')
+
+    expect(screen.queryByText('Netflix')).not.toBeInTheDocument()
+    expect(screen.getByText('Spotify')).toBeInTheDocument()
+  })
+
+  test('al hacer click en la cabecera "Precio" ordena ascendente y luego descendente', async () => {
+    const user = userEvent.setup()
+    subscriptionsService.getSubscriptions.mockResolvedValue(mockSubs)
+    loginAs('free')
+
+    renderAtDashboard()
+    await screen.findByText('Netflix')
+
+    const priceHeader = screen.getByRole('button', { name: /ordenar por precio/i })
+
+    await user.click(priceHeader)
+    let cells = screen.getAllByRole('row').slice(1).map((row) => row.cells[1].textContent)
+    expect(cells).toEqual(['Spotify', 'Netflix'])
+
+    await user.click(priceHeader)
+    cells = screen.getAllByRole('row').slice(1).map((row) => row.cells[1].textContent)
+    expect(cells).toEqual(['Netflix', 'Spotify'])
+  })
+
+  test('si los filtros no devuelven resultados muestra mensaje específico', async () => {
+    const user = userEvent.setup()
+    subscriptionsService.getSubscriptions.mockResolvedValue(mockSubs)
+    loginAs('free')
+
+    renderAtDashboard()
+    await screen.findByText('Netflix')
+
+    await user.type(screen.getByLabelText(/buscar/i), 'zzzzz')
+
+    expect(
+      screen.getByText(/no hay suscripciones que coincidan/i),
+    ).toBeInTheDocument()
+  })
+
   test('botón eliminar borra la suscripción y refresca la lista', async () => {
     const user = userEvent.setup()
     subscriptionsService.getSubscriptions
