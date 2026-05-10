@@ -13,13 +13,13 @@ export function AuthProvider({ children }) {
 
   async function login(email, password) {
     const data = await authService.login(email, password)
-    setUser(data.user)
-    setToken(data.accessToken)
-    // [LEARN] Guardar el JWT en localStorage es vulnerable a XSS: cualquier
-    // script malicioso inyectado puede leerlo. Alternativa profesional:
-    // cookie httpOnly (no accesible desde JS). Aceptable para el proyecto.
-    localStorage.setItem('token', data.accessToken)
-    localStorage.setItem('user', JSON.stringify(data.user))
+    persistSession(data)
+  }
+
+  async function register(email, password) {
+    const data = await authService.register(email, password)
+    // Tras un registro exitoso el backend devuelve token + user → auto-login.
+    persistSession(data)
   }
 
   function logout() {
@@ -29,7 +29,17 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('user')
   }
 
-  const value = { user, token, login, logout }
+  function persistSession({ accessToken, user }) {
+    setUser(user)
+    setToken(accessToken)
+    // [LEARN] Guardar el JWT en localStorage es vulnerable a XSS: cualquier
+    // script malicioso inyectado puede leerlo. Alternativa profesional:
+    // cookie httpOnly (no accesible desde JS). Aceptable para el proyecto.
+    localStorage.setItem('token', accessToken)
+    localStorage.setItem('user', JSON.stringify(user))
+  }
+
+  const value = { user, token, login, register, logout }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
