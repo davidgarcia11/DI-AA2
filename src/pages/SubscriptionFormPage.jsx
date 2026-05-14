@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
+import { getLogoUrl } from '../utils/logo'
 import {
   createSubscription,
   getSubscription,
@@ -153,6 +154,24 @@ export default function SubscriptionFormPage() {
               placeholder="netflix.com"
             />
           </div>
+
+          {(form.domain || form.name) && (
+            <div className="field field--full">
+              <p className="text-muted" style={{ fontSize: '0.85rem', marginBottom: '0.25rem' }}>
+                Vista previa del logo (vía Clearbit)
+              </p>
+              <img
+                src={getLogoUrl(form.name, form.domain)}
+                alt="Vista previa del logo"
+                width="48"
+                height="48"
+                style={{ borderRadius: '8px' }}
+                onError={(e) => {
+                  e.target.style.display = 'none'
+                }}
+              />
+            </div>
+          )}
         </div>
 
         {error && (

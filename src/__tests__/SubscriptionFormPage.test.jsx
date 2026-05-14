@@ -119,6 +119,25 @@ describe('SubscriptionFormPage — modo crear', () => {
       await screen.findByText(/no se pudo guardar/i),
     ).toBeInTheDocument()
   })
+
+  test('al escribir un dominio aparece el preview del logo de Clearbit', async () => {
+    const user = userEvent.setup()
+    loginAs('free')
+    renderAt('/subscriptions/new')
+
+    await user.type(screen.getByLabelText(/dominio/i), 'netflix.com')
+
+    const preview = screen.getByRole('img', { name: /vista previa del logo/i })
+    expect(preview).toBeInTheDocument()
+    expect(preview).toHaveAttribute('src', expect.stringContaining('netflix.com'))
+  })
+
+  test('el preview no aparece cuando el campo dominio y el nombre están vacíos', () => {
+    loginAs('free')
+    renderAt('/subscriptions/new')
+
+    expect(screen.queryByRole('img', { name: /vista previa del logo/i })).not.toBeInTheDocument()
+  })
 })
 
 describe('SubscriptionFormPage — modo editar', () => {
