@@ -35,7 +35,7 @@ export default function Layout() {
             </li>
             {user?.role === 'premium' && (
               <li>
-                <NavLink to="/dashboard" className="nav-link">
+                <NavLink to="/analytics" className="nav-link">
                   Estadísticas avanzadas
                 </NavLink>
               </li>

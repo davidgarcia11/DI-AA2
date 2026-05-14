@@ -49,3 +49,47 @@ describe('ProtectedRoute', () => {
     expect(screen.queryByText('Login Page')).not.toBeInTheDocument()
   })
 })
+
+describe('ProtectedRoute — control de acceso por rol', () => {
+  beforeEach(() => localStorage.clear())
+
+  function renderWithRole(role, allowedRoles) {
+    if (role) {
+      localStorage.setItem('token', 'fake-jwt')
+      localStorage.setItem('user', JSON.stringify({ id: 1, email: `${role}@test.com`, role }))
+    }
+    return render(
+      <MemoryRouter initialEntries={['/analytics']}>
+        <AuthProvider>
+          <Routes>
+            <Route path="/dashboard" element={<div>Dashboard</div>} />
+            <Route
+              path="/analytics"
+              element={
+                <ProtectedRoute allowedRoles={allowedRoles}>
+                  <div>Analytics Page</div>
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </AuthProvider>
+      </MemoryRouter>,
+    )
+  }
+
+  test('usuario premium accede a la ruta con allowedRoles premium', () => {
+    renderWithRole('premium', ['premium'])
+    expect(screen.getByText('Analytics Page')).toBeInTheDocument()
+  })
+
+  test('usuario free es redirigido al dashboard desde una ruta premium', () => {
+    renderWithRole('free', ['premium'])
+    expect(screen.getByText('Dashboard')).toBeInTheDocument()
+    expect(screen.queryByText('Analytics Page')).not.toBeInTheDocument()
+  })
+
+  test('sin allowedRoles cualquier usuario autenticado accede', () => {
+    renderWithRole('free', undefined)
+    expect(screen.getByText('Analytics Page')).toBeInTheDocument()
+  })
+})
