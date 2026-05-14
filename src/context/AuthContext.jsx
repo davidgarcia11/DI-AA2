@@ -1,13 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useReducer } from 'react'
 import * as authService from '../services/auth.service'
 import { AuthContext } from './auth-context'
+import { AUTH_ACTIONS, authReducer, getInitialState } from './auth-reducer'
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem('user')
-    return stored ? JSON.parse(stored) : null
-  })
-  const [token, setToken] = useState(() => localStorage.getItem('token'))
+  const [state, dispatch] = useReducer(authReducer, getInitialState())
 
   async function login(email, password) {
     const data = await authService.login(email, password)
@@ -16,39 +13,32 @@ export function AuthProvider({ children }) {
 
   async function register(email, password) {
     const data = await authService.register(email, password)
-    // Tras un registro exitoso el backend devuelve token + user → auto-login.
     persistSession(data)
   }
 
   function logout() {
-    setUser(null)
-    setToken(null)
     localStorage.removeItem('token')
     localStorage.removeItem('user')
+    dispatch({ type: AUTH_ACTIONS.LOGOUT })
   }
 
-  // Si el interceptor HTTP detecta un 401 (token expirado o inválido), limpia
-  // el estado en memoria. ProtectedRoute redirigirá a /login automáticamente.
   useEffect(() => {
     function handleExpired() {
-      setUser(null)
-      setToken(null)
+      dispatch({ type: AUTH_ACTIONS.EXPIRED })
     }
     window.addEventListener('auth:expired', handleExpired)
     return () => window.removeEventListener('auth:expired', handleExpired)
   }, [])
 
   function persistSession({ accessToken, user }) {
-    setUser(user)
-    setToken(accessToken)
-    // [LEARN] Guardar el JWT en localStorage es vulnerable a XSS: cualquier
-    // script malicioso inyectado puede leerlo. Alternativa profesional:
-    // cookie httpOnly (no accesible desde JS). Aceptable para el proyecto.
+    // [LEARN] localStorage persiste la sesión entre recargas, pero es
+    // vulnerable a XSS. En producción se usaría cookie httpOnly.
     localStorage.setItem('token', accessToken)
     localStorage.setItem('user', JSON.stringify(user))
+    dispatch({ type: AUTH_ACTIONS.LOGIN, payload: { user, token: accessToken } })
   }
 
-  const value = { user, token, login, register, logout }
+  const value = { user: state.user, token: state.token, login, register, logout }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

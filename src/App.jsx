@@ -2,13 +2,12 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
+import AnalyticsPage from './pages/AnalyticsPage'
 import DashboardPage from './pages/DashboardPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import SubscriptionFormPage from './pages/SubscriptionFormPage'
 
-// AuthProvider envuelve TODO el árbol de rutas para que ProtectedRoute
-// y cualquier página puedan leer el estado de auth con useAuth().
 export default function App() {
   return (
     <AuthProvider>
@@ -28,6 +27,14 @@ export default function App() {
           <Route
             path="/subscriptions/:id/edit"
             element={<SubscriptionFormPage />}
+          />
+          <Route
+            path="/analytics"
+            element={
+              <ProtectedRoute allowedRoles={['premium']}>
+                <AnalyticsPage />
+              </ProtectedRoute>
+            }
           />
         </Route>
 
