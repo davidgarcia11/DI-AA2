@@ -44,7 +44,7 @@ Aplicación web para llevar el control de las suscripciones mensuales recurrente
 | Capa | Tecnología |
 |------|------------|
 | Frontend | React 19, React Router 7, Vite |
-| Estado global | Context API (AuthContext) |
+| Estado global | Context API + `useReducer` (AuthContext) |
 | HTTP | Axios |
 | Gráficos | Chart.js + react-chartjs-2 |
 | Backend mock | json-server + json-server-auth |
@@ -189,13 +189,13 @@ Estrategia:
 
 ### Funcionalidades obligatorias (5/5)
 - ✅ **Autenticación y autorización** — JWT, persistencia, ProtectedRoute, control basado en rol (`user.role`).
-- ✅ **Gestión de estado global** — Context API en `AuthContext`. Estado local en el dashboard cuando aplica.
+- ✅ **Gestión de estado global** — Context API en `AuthContext` con un reducer puro (`authReducer`) que gestiona las transiciones `LOGIN`, `LOGOUT` y `EXPIRED`. Estado local en el dashboard cuando aplica.
 - ✅ **Integración de datos y servicios** — capa `services/` centraliza el acceso HTTP. Estados loading/ready/error/empty en cada página de datos.
 - ✅ **Dashboard funcional** — tabla con orden y filtros reactivos, búsqueda, componentes de resumen, gestión de los cuatro estados.
 - ✅ **Testing automatizado** — 110 tests Vitest cubriendo lógica crítica.
 
 ### Funcionalidades extra
-- ✅ **Flujo Git profesional** — feature branches, conventional commits en español, PRs con merge commit (preserva ramas y commits TDD), 14+ PRs totales.
+- ✅ **Flujo Git profesional** — feature branches, conventional commits en español, PRs con merge commit (preserva ramas y commits TDD), 18 PRs totales.
 - ✅ **API externa** — Google Favicons API integrada (logos automáticos a partir del nombre o dominio del servicio, con preview en vivo en el formulario).
 - ✅ **Madurez técnica** — sistema de estilos coherente, accesibilidad básica, gestión global de errores, optimización con lazy load, documentación completa, lint limpio.
 - ⏳ Testing E2E (Playwright) — no implementado.
@@ -203,13 +203,14 @@ Estrategia:
 
 ## Uso crítico de la IA
 
-Este proyecto se ha desarrollado en colaboración con un asistente de IA (Claude). Se ha mantenido un uso **crítico y reflexivo** siguiendo estos principios:
+Durante el desarrollo se ha utilizado un asistente de IA (Claude) como herramienta de apoyo puntual: redacción de mensajes de commit, consultas de sintaxis, borradores de documentación y debugging acotado. La arquitectura, las decisiones de seguridad y la comprensión del código son responsabilidad del desarrollador.
 
-- **TDD obligatorio** para toda la lógica nueva. Ningún código se escribe sin tener antes un test fallido que lo justifique.
-- **Revisión humana de toda decisión técnica**: la IA sugiere alternativas pero la decisión final (estructura, dependencias, naming) es del autor del proyecto.
-- **Cada commit es atómico** y describe el _qué_ y el _por qué_; no hay commits "varias cosas a la vez".
-- **Decisiones de seguridad propias**: por ejemplo, los permisos `600` del backend (frente al `660` que sugería la documentación) y la decisión de no exponer un selector de rol en el registro (evita auto-promoción a premium) se tomaron sólo después de razonar sobre vectores de ataque concretos.
-- **No se confía en la IA para tests verdes**: cada cambio se verifica ejecutando la suite local antes de hacer commit y antes de mergear el PR.
+Principios aplicados:
+
+- **Comprensión antes que código**: cada bloque que entra al repo se entiende y se puede defender oralmente. Si no se entiende, no se acepta.
+- **Decisiones técnicas propias**: estructura, dependencias, naming, decisiones de seguridad. Por ejemplo, los permisos `600` del backend (frente al `660` que sugería la documentación) y la decisión de no exponer un selector de rol en el registro se tomaron tras razonar sobre vectores de ataque concretos.
+- **Validación local de la suite**: cada cambio se verifica ejecutando los tests localmente antes de hacer commit y antes de mergear el PR. No se confía en la IA para confirmar que "todo está verde".
+- **Commits atómicos**: cada commit cuenta un cambio lógico y describe el _qué_ y el _por qué_; no hay commits que mezclen cambios sin relación.
 
 Para más detalle, ver [`USE_OF_AI.md`](./USE_OF_AI.md).
 
