@@ -90,7 +90,7 @@ describe('DashboardPage', () => {
     expect(screen.getByText(formatDate('2026-06-15'))).toBeInTheDocument()
   })
 
-  test('cada item muestra el logo de Clearbit con el dominio del servicio', async () => {
+  test('cada item muestra el logo del servicio a partir de su dominio', async () => {
     subscriptionsService.getSubscriptions.mockResolvedValue(mockSubs)
     loginAs('free')
 
