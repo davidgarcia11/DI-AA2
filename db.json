@@ -2,13 +2,13 @@
   "users": [
     {
       "email": "free@test.com",
-      "password": "$2a$10$W38xHMCLQY6Bi1j9nivDP.MaBupaamKbQ7kgViNFd6Nuz9xNMqRja",
+      "password": "$2a$10$tgHbkI1CYrnwTaP2vyRr5eLFX8Dhj7/t4VyigdjtgHOk5T9H5WhW.",
       "role": "free",
       "id": 1
     },
     {
       "email": "premium@test.com",
-      "password": "$2a$10$mcL6k66d3G9PGUKI3hb6/e5eJb44kD/p7VZRhpGbVvyl2Lz0jwJee",
+      "password": "$2a$10$tgHbkI1CYrnwTaP2vyRr5eLFX8Dhj7/t4VyigdjtgHOk5T9H5WhW.",
       "role": "premium",
       "id": 2
     }
@@ -53,6 +53,16 @@
       "billingCycle": "monthly",
       "renewalDate": "2026-06-10",
       "domain": "spotify.com"
+    },
+    {
+      "userId": 1,
+      "name": "Amazon",
+      "price": 30,
+      "category": "entretenimiento",
+      "billingCycle": "yearly",
+      "renewalDate": "2027-03-03",
+      "domain": "amazon.es",
+      "id": 5
     }
   ]
 }

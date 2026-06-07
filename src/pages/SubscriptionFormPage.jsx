@@ -20,7 +20,7 @@ const EMPTY_FORM = {
 const CATEGORIES = ['entretenimiento', 'musica', 'trabajo', 'otro']
 
 export default function SubscriptionFormPage() {
-  const { token } = useAuth()
+  const { token, user } = useAuth()
   const navigate = useNavigate()
   const { id } = useParams()
   const isEdit = Boolean(id)
@@ -51,6 +51,7 @@ export default function SubscriptionFormPage() {
     event.preventDefault()
     setError('')
     const payload = {
+      userId: user.id,
       name: form.name,
       price: Number(form.price),
       category: form.category,
@@ -158,7 +159,7 @@ export default function SubscriptionFormPage() {
           {(form.domain || form.name) && (
             <div className="field field--full">
               <p className="text-muted" style={{ fontSize: '0.85rem', marginBottom: '0.25rem' }}>
-                Vista previa del logo (vía Clearbit)
+                Vista previa del logo
               </p>
               <img
                 src={getLogoUrl(form.name, form.domain)}
