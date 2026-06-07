@@ -121,7 +121,7 @@ describe('SubscriptionFormPage — modo crear', () => {
     ).toBeInTheDocument()
   })
 
-  test('al escribir un dominio aparece el preview del logo de Clearbit', async () => {
+  test('al escribir un dominio aparece el preview del logo del servicio', async () => {
     const user = userEvent.setup()
     loginAs('free')
     renderAt('/subscriptions/new')
