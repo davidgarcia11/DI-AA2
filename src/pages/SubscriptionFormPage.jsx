@@ -159,7 +159,7 @@ export default function SubscriptionFormPage() {
           {(form.domain || form.name) && (
             <div className="field field--full">
               <p className="text-muted" style={{ fontSize: '0.85rem', marginBottom: '0.25rem' }}>
-                Vista previa del logo (vía Clearbit)
+                Vista previa del logo
               </p>
               <img
                 src={getLogoUrl(form.name, form.domain)}
