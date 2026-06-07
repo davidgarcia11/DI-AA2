@@ -49,7 +49,7 @@ Sin estado, sin efectos. Cada utilidad tiene su propio test unitario:
 - `stats.js` — `computeStats`, `computeByCategory`, `upcomingRenewals`.
 - `filterAndSort.js` — filtra por búsqueda + categoría y ordena por columna.
 - `csv.js` — serializa suscripciones a CSV con escape RFC 4180.
-- `logo.js` — construye la URL de Clearbit a partir del nombre o dominio.
+- `logo.js` — construye la URL de Google Favicons a partir del nombre o dominio.
 
 ### `services/` — capa HTTP
 Centraliza el acceso a la API. Cada función usa Axios y expone una promesa con datos ya extraídos de `response.data`.

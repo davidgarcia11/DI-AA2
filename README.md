@@ -26,7 +26,7 @@ Aplicación web para llevar el control de las suscripciones mensuales recurrente
 - **Tabla de suscripciones** con búsqueda por nombre, filtro por categoría y orden por columnas (nombre, precio, próxima renovación).
 - **Estadísticas resumen**: número de suscripciones, gasto mensual equivalente y próxima renovación.
 - **Gestión completa CRUD**: crear, editar y eliminar suscripciones con formulario controlado.
-- **Logos automáticos** de cada servicio vía Clearbit Logo API.
+- **Logos automáticos** de cada servicio vía Google Favicons API.
 
 ### Solo para usuarios premium
 - **Gráfico donut** de gasto mensual por categoría (Chart.js, lazy-loaded).
@@ -49,7 +49,7 @@ Aplicación web para llevar el control de las suscripciones mensuales recurrente
 | Gráficos | Chart.js + react-chartjs-2 |
 | Backend mock | json-server + json-server-auth |
 | Tests unitarios | Vitest + React Testing Library + happy-dom |
-| API externa | Clearbit Logo API (logos de servicios) |
+| API externa | Google Favicons API (logos de servicios) |
 | Linting | ESLint con react-hooks y react-refresh |
 
 ## Puesta en marcha
@@ -148,7 +148,7 @@ DI-AA2/
 │   │   ├── formatters.js
 │   │   ├── logo.js
 │   │   └── stats.js
-│   └── __tests__/           # Suite Vitest (94 tests, 20 ficheros)
+│   └── __tests__/           # Suite Vitest (110 tests, 22 ficheros)
 ```
 
 ## Decisiones técnicas
@@ -158,8 +158,8 @@ Se documentan aquí las decisiones no obvias del proyecto. Para más detalle, ve
 | # | Decisión | Razón |
 |---|----------|-------|
 | 1 | json-server en `.cjs` | El `package.json` declara `"type": "module"` y la API de json-server es CommonJS. |
-| 2 | Permisos `600` en json-server-auth (no `660`) | Cada usuario solo ve sus propias suscripciones — evita un IDOR trivial. |
-| 3 | `useState` en AuthContext (no `useReducer`) | El estado de auth tiene 4 transiciones simples; un reducer añadiría complejidad sin beneficio. |
+| 2 | Permisos `600` en json-server-auth **+ middleware de filtrado por `userId`** | La regla 600 solo autoriza el acceso; no filtra el listado GET. Sin un middleware adicional en `server.cjs` que inyecte `?userId=X` a partir del JWT, cualquier usuario autenticado veía las suscripciones de los demás. |
+| 3 | `useReducer` en AuthContext | El estado de auth tiene varias transiciones (`LOGIN`, `LOGOUT`, `EXPIRED`) y un reducer puro (`authReducer`) las hace explícitas y testables, además de cumplir el requisito del enunciado. |
 | 4 | Sin `RoleRoute` wrapper | Renderizado condicional inline (`user?.role === 'premium' && ...`) suficiente para la escala. |
 | 5 | El registro siempre crea cuentas free | El frontend no expone selector de rol — evita auto-promoción a premium. |
 | 6 | `noValidate` en formularios | La validación HTML5 nativa bloqueaba submits en happy-dom durante los tests; las restricciones reales ocurren a nivel de campo. |
@@ -168,10 +168,12 @@ Se documentan aquí las decisiones no obvias del proyecto. Para más detalle, ve
 | 9 | Lazy load de Chart.js | Reduce el bundle principal en ~150 kB para usuarios free. |
 | 10 | `auth-context.js` separado de `AuthContext.jsx` | El linter de fast-refresh no permite mezclar componentes con exports de contexto en el mismo fichero. |
 | 11 | Mock de `react-chartjs-2` en tests | Chart.js requiere canvas y happy-dom no lo implementa al nivel necesario. |
+| 12 | Migración de Clearbit a Google Favicons para los logos | Clearbit cerró el tier gratuito de su Logo API durante el desarrollo y las peticiones devolvían 404. Google Favicons no requiere clave y es cacheable, a cambio de una calidad de imagen algo menor. |
+| 13 | `userId` se inyecta en el payload de create/update | json-server no asocia el recurso al autor del token automáticamente. Sin `userId` explícito en el body, la regla 600 dejaba pasar el POST pero el recurso quedaba sin dueño y otros usuarios podían listarlo. |
 
 ## Testing
 
-La suite incluye **94 tests** repartidos en **20 ficheros** que cubren utilidades, servicios, contexto, componentes y páginas.
+La suite incluye **110 tests** repartidos en **22 ficheros** que cubren utilidades, servicios, contexto, componentes y páginas.
 
 ```bash
 npm run test
@@ -190,11 +192,11 @@ Estrategia:
 - ✅ **Gestión de estado global** — Context API en `AuthContext`. Estado local en el dashboard cuando aplica.
 - ✅ **Integración de datos y servicios** — capa `services/` centraliza el acceso HTTP. Estados loading/ready/error/empty en cada página de datos.
 - ✅ **Dashboard funcional** — tabla con orden y filtros reactivos, búsqueda, componentes de resumen, gestión de los cuatro estados.
-- ✅ **Testing automatizado** — 94 tests Vitest cubriendo lógica crítica.
+- ✅ **Testing automatizado** — 110 tests Vitest cubriendo lógica crítica.
 
 ### Funcionalidades extra
 - ✅ **Flujo Git profesional** — feature branches, conventional commits en español, PRs con merge commit (preserva ramas y commits TDD), 14+ PRs totales.
-- ✅ **API externa** — Clearbit Logo API integrada (logos automáticos a partir del nombre de servicio).
+- ✅ **API externa** — Google Favicons API integrada (logos automáticos a partir del nombre o dominio del servicio, con preview en vivo en el formulario).
 - ✅ **Madurez técnica** — sistema de estilos coherente, accesibilidad básica, gestión global de errores, optimización con lazy load, documentación completa, lint limpio.
 - ⏳ Testing E2E (Playwright) — no implementado.
 - ⏳ Despliegue en contenedores + cloud — no implementado.
