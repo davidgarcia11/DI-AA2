@@ -20,7 +20,7 @@ const EMPTY_FORM = {
 const CATEGORIES = ['entretenimiento', 'musica', 'trabajo', 'otro']
 
 export default function SubscriptionFormPage() {
-  const { token } = useAuth()
+  const { token, user } = useAuth()
   const navigate = useNavigate()
   const { id } = useParams()
   const isEdit = Boolean(id)
@@ -51,6 +51,7 @@ export default function SubscriptionFormPage() {
     event.preventDefault()
     setError('')
     const payload = {
+      userId: user.id,
       name: form.name,
       price: Number(form.price),
       category: form.category,

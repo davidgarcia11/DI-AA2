@@ -75,6 +75,7 @@ describe('SubscriptionFormPage — modo crear', () => {
     expect(subscriptionsService.createSubscription).toHaveBeenCalledWith(
       'fake-jwt',
       {
+        userId: 1,
         name: 'HBO Max',
         price: 8.99,
         category: 'entretenimiento',
