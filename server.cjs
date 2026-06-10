@@ -10,12 +10,11 @@ const rules = auth.rewriter({
   subscriptions: 600,
 })
 
-app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*')
-  res.header('Access-Control-Allow-Headers', 'Authorization, Content-Type')
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS')
-  res.sendStatus(200)
-})
+// Los middlewares por defecto de json-server (incluido CORS) deben ir PRIMERO,
+// antes que el middleware de auth. Si van después, las respuestas de /login y
+// /register —que resuelve auth— salen sin la cabecera Access-Control-Allow-Origin
+// y el navegador las bloquea con un error de CORS, aunque el backend responda 200.
+app.use(jsonServer.defaults())
 app.use(rules)
 app.use(auth)
 // json-server-auth no filtra los resultados en GET de lista (solo permite/deniega
@@ -27,7 +26,6 @@ app.use('/subscriptions', (req, res, next) => {
   }
   next()
 })
-app.use(jsonServer.defaults())
 app.use(router)
 
 app.listen(3001, () => {
