@@ -63,6 +63,31 @@ describe('LoginPage', () => {
     ).toBeInTheDocument()
   })
 
+  test('mientras la petición está en curso deshabilita el botón y muestra estado de carga', async () => {
+    const user = userEvent.setup()
+    // Promesa controlada: la resolvemos manualmente para inspeccionar el
+    // estado del botón mientras el login sigue en vuelo.
+    let resolveLogin
+    authService.login.mockReturnValue(
+      new Promise((resolve) => {
+        resolveLogin = resolve
+      }),
+    )
+
+    renderAppAtLogin()
+    await user.type(screen.getByLabelText(/email/i), 'free@test.com')
+    await user.type(screen.getByLabelText(/contraseña/i), 'test1234')
+    await user.click(screen.getByRole('button', { name: /entrar/i }))
+
+    const submitButton = screen.getByRole('button', { name: /entrando/i })
+    expect(submitButton).toBeDisabled()
+
+    resolveLogin({
+      accessToken: 'tok',
+      user: { id: 1, email: 'free@test.com', role: 'free' },
+    })
+  })
+
   test('si las credenciales son inválidas muestra mensaje de error', async () => {
     const user = userEvent.setup()
     authService.login.mockRejectedValue(new Error('401 Unauthorized'))

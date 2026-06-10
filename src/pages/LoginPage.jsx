@@ -9,10 +9,12 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   async function handleSubmit(event) {
     event.preventDefault()
     setError(null)
+    setIsSubmitting(true)
     try {
       await login(email, password)
       navigate('/dashboard')
@@ -20,6 +22,7 @@ export default function LoginPage() {
       // No exponemos el mensaje original del backend para no dar pistas
       // sobre si el email existe o no (enumeración de cuentas).
       setError('Email o contraseña incorrectos')
+      setIsSubmitting(false)
     }
   }
 
@@ -62,8 +65,12 @@ export default function LoginPage() {
             </p>
           )}
 
-          <button type="submit" className="btn btn--primary">
-            Entrar
+          <button
+            type="submit"
+            className="btn btn--primary"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Entrando…' : 'Entrar'}
           </button>
         </form>
 
