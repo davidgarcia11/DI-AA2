@@ -9,10 +9,12 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   async function handleSubmit(event) {
     event.preventDefault()
     setError(null)
+    setIsSubmitting(true)
     try {
       await register(email, password)
       navigate('/dashboard')
@@ -20,6 +22,7 @@ export default function RegisterPage() {
       // Mensaje genérico — el backend puede fallar por email duplicado,
       // formato inválido, etc. No exponemos el detalle al usuario.
       setError('No se ha podido crear la cuenta. Revisa los datos.')
+      setIsSubmitting(false)
     }
   }
 
@@ -67,8 +70,12 @@ export default function RegisterPage() {
             </p>
           )}
 
-          <button type="submit" className="btn btn--primary">
-            Crear cuenta
+          <button
+            type="submit"
+            className="btn btn--primary"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Creando…' : 'Crear cuenta'}
           </button>
         </form>
 
